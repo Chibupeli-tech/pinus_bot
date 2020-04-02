@@ -1,4 +1,5 @@
 const Discord = require('discord.js');
+const config = require('./config');
 const dbRequest = require('./db').request;
 const client = new Discord.Client();
 
@@ -138,5 +139,5 @@ client.on('guildMemberAdd', member => {
     kickPasha(channel, member);
   }
 });
-client.login('');
+client.login(config.BOT_TOKEN);
 
