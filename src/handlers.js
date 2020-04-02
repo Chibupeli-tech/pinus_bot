@@ -1,7 +1,8 @@
 const {bannedIds, allowedIds} = require('./ids');
 const { updateFromDb } = require('./db');
+const { reportError } = require('./error');
 
-function handleMessage(message, commands, reportError) {
+function handleMessage(message, commands) {
   if (!allowedIds.includes(message.author.id))
     return;
 

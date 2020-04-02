@@ -2,6 +2,7 @@ const axios = require('axios');
 
 const config = require('../config');
 const { bannedIds } = require('./ids');
+const { reportError } = require('./error');
 const req = (q) => ({
   jsonrpc: '2.0',
   id: 0,
@@ -42,7 +43,7 @@ function updateFromDb() {
     reportError(err);
   });
 }
-function addToDb(id, reportError) {
+function addToDb(id) {
   request(`INSERT INTO \`pinus\` (\`id\`, \`discord_id\`) VALUES (NULL, '${id}');`)
     .then(() => { })
     .catch((err) => { reportError(err) });

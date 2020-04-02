@@ -1,7 +1,7 @@
 const Discord = require('discord.js');
 
 const config = require('./config');
-const {updateFromDb, addToDb} = require('./src/db');
+const { addToDb } = require('./src/db');
 
 global.client = new Discord.Client();
 const handlers = require('./src/handlers');
@@ -26,9 +26,6 @@ function findPasha() {
   return found;
 }
 
-function reportError(err) {
-  client.users.fetch(owner_id).then(u => u.send('```' + err.stack + '```'));
-}
 
 let delayed = 0;
 
@@ -64,7 +61,7 @@ const commands = [
       pashas_ids.push(id);
       message.channel.send(`Id added`);
       
-      addToDb(id, reportError);
+      addToDb(id);
       
       logPasha(message);
       message.channel.send(`Running retard check...`);
@@ -94,7 +91,7 @@ client.on('ready', () => {
 });
 
 client.on('message', message => {
-  handlers.handleMessage(message, allowedIds, commands, reportError);
+  handlers.handleMessage(message, allowedIds, commands);
 });
 
 client.on('guildMemberAdd', member => {
