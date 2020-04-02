@@ -1,7 +1,10 @@
 const Discord = require('discord.js');
+
 const config = require('./config');
-const dbRequest = require('./db').request;
-const client = new Discord.Client();
+const {updateFromDb, addToDb} = require('./src/db');
+
+global.client = new Discord.Client();
+const handlers = require('./src/handlers');
 
 const owner_id = '258680327906525184';
 const pashas_ids = ['318834208741261312', '594919505956700170'];
@@ -24,7 +27,7 @@ function findPasha() {
 }
 
 function reportError(err) {
-  client.users.fetch(owner_id).then(u => u.send('```' + err + '```'));
+  client.users.fetch(owner_id).then(u => u.send('```' + err.stack + '```'));
 }
 
 let delayed = 0;
@@ -48,29 +51,6 @@ function logPasha(msg) {
   );
 }
 
-function updateFromDb() {
-  dbRequest('SELECT * from `pinus`;').then(data => {
-    // Clear id's array
-    // xD
-    Array(3).fill(0).forEach(() => { pashas_ids.pop() });
-    pashas_ids.push(...data.map(({ discord_id }) => discord_id));
-    console.log('Id index updated...');
-  }).catch(err => {
-    throw err
-  });
-}
-client.on('ready', () => {
-  console.log(`Logged in as ${client.user.tag}!`);
-  console.log('I am ready!');
-  console.log('Updating db index');
-  try {
-    updateFromDb()
-  } catch (error) {
-    // Securign failsafe
-    pashas_ids.push(...['318834208741261312', '594919505956700170']);
-    reportError(error.stack);
-  }
-});
 
 const commands = [
   {
@@ -83,11 +63,9 @@ const commands = [
 
       pashas_ids.push(id);
       message.channel.send(`Id added`);
-
-      dbRequest(`INSERT INTO \`pinus\` (\`id\`, \`discord_id\`) VALUES (NULL, '${id}');`)
-      .then(() => { })
-      .catch((err) => { reportError(err.stack) });
-
+      
+      addToDb(id, reportError);
+      
       logPasha(message);
       message.channel.send(`Running retard check...`);
       const member = findPasha();
@@ -110,34 +88,19 @@ const commands = [
   }
 ];
 
+
+client.on('ready', () => {
+  handlers.handleReady();
+});
+
 client.on('message', message => {
-  if (allowedIds.includes(message.author.id)) {
-    if (message.content.startsWith('..')) {
-      const cmd = message.content.replace('..', '');
-      const args = cmd.split(' ');
-      const [name] = args;
-      console.log({ name, cmd, args });
-      for (const command of commands) {
-        if (command.name === name) {
-          try {
-            command.f(message, args);
-          } catch (error) {
-            reportError(error.stack);
-            message.channel.send(`${error}`);
-          }
-        }
-      }
-    }
-  }
+  handlers.handleMessage(message, allowedIds, commands, reportError);
 });
-// Create an event listener for new guild members
+
 client.on('guildMemberAdd', member => {
-  const tgt_channel = '422309477132402690';
-  const channel = member.guild.channels.cache.find(ch => ch.id === tgt_channel);
-  if (!channel) return;
-  if (pashas_ids.includes(member.id)) {
-    kickPasha(channel, member);
-  }
+  // TODO: varible greetings channel
+  handlers.handleJoin(member, '422309477132402690', pashas_ids, kickPasha);
 });
+
 client.login(config.BOT_TOKEN);
 
