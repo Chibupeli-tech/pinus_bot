@@ -32,7 +32,7 @@ function request(query) {
 }
 
 function updateFromDb() {
-  request('SELECT * from `pinus`;').then(data => {
+  return request('SELECT * from `pinus`;').then(data => {
     // Clear id's array
     // xD
     Array(bannedIds.length).fill(0).forEach(() => { bannedIds.pop() });

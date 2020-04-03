@@ -1,13 +1,16 @@
-const { handleMessage } = require('../src/handlers');
+jest.mock('../src/commands');
+jest.mock('../src/error');
+const { setCommands,
+        setAllowedIds,
+        setReportError } = require('./testUtils');
 
 const mockCommands = [
   {
     name: 'test',
-    f: function (message, args) {
-      expect(message).toBe(mockCommandMessage);
-      expect(args).toBe(['test']);
-      pass();
-    }
+    f: jest.fn((message, args) => {
+      expect(message).toBe(mockMessages['command']);
+      //expect(args).toBe(['test']);
+    })
   },
   {
     name: 'error',
@@ -17,15 +20,20 @@ const mockCommands = [
   },
   {
     name: 'fail',
-    f: function (message, args) {
-      throw new Error('This should not be reached')
-    }
+    f: jest.fn()
   }
-]
-const mockAllowedIds = [
-  '0'
 ];
-const mockdMessages = {
+
+setCommands(mockCommands);
+setAllowedIds([
+  '0'
+]);
+const report = jest.fn((err) => {
+  expect(err.toString()).toBe('Error: Sample error');
+})
+setReportError(report);
+
+const mockMessages = {
   'command': {
     author: { id: '0' },
     content: '..test',
@@ -37,55 +45,54 @@ const mockdMessages = {
     author: { id: '0' },
     content: 'test',
     channel: {
-      send: () => { }
+      send: jest.fn()
     }
   },
   'error-command': {
     author: { id: '0' },
     content: '..error',
     channel: {
-      send: (text) => { expect(text.toString()).toBe('Error: Sample error'); }
+      send: jest.fn((text) => { expect(text.toString()).toBe('Error: Sample error'); })
     }
   },
   'not-allowed': {
     author: { id: '12321' },
     content: '..fail',
     channel: {
-      send: (text) => { expect(text.toString()).toBe('Error: Sample error'); }
+      send: jest.fn()
     }
   }
 }
 
-
-test('Properly handle command message', () => {
-  handleMessage(mockdMessages['command'],
-    mockAllowedIds,
-    mockCommands,
-    () => { });
-  // Dont care about error reporting for now
-});
-
-test('Properly handle non-command message', () => {
-  expect(handleMessage(mockdMessages['non-command'],
-    mockAllowedIds,
-    mockCommands,
-    () => { })).toBe(undefined);
-  // Dont care about error reporting for now
-});
-
-test('Properly handle command error', () => {
-  handleMessage(mockdMessages['error-command'],
-    mockAllowedIds,
-    mockCommands,
-    (e) => {
-      expect(e.toString()).toBe('Error: Sample error');
-    });
-
-});
-
-test('Properly handle command from not allowed user', () => {
-  expect(handleMessage(mockdMessages['not-allowed'],
-    mockAllowedIds,
-    mockCommands,
-    (e) => { throw e })).toBe(undefined);
-});
+const { handleMessage } = require('../src/handlers');
+describe('On incoming message', () => {
+  
+  afterEach(() => {    
+    jest.clearAllMocks();
+  });
+  
+  it('Properly handle command message', () => {
+    handleMessage(mockMessages['command']);
+    expect(mockCommands[0].f).toHaveBeenCalled();
+    expect(report).not.toHaveBeenCalled();
+  });
+  
+  it('Properly handle non-command message', () => {
+    handleMessage(mockMessages['non-command']);
+    expect(mockMessages['non-command'].channel.send).not.toHaveBeenCalled();
+    expect(report).not.toHaveBeenCalled();
+  });
+  
+  it('Properly handle command error', () => {
+    handleMessage(mockMessages['error-command']);
+    expect(report).toHaveBeenCalled();
+    expect(mockMessages['error-command'].channel.send).toHaveBeenCalled();
+  });
+  
+  it('Properly handle command from not allowed user', () => {
+    handleMessage(mockMessages['not-allowed']);
+    expect(mockCommands[2].f).not.toHaveBeenCalled();
+    expect(mockMessages["not-allowed"].channel.send).not.toHaveBeenCalled();
+    expect(report).not.toHaveBeenCalled();
+  });  
+})

@@ -1,12 +1,4 @@
-
-const oConsoleLog = console.log;
-
-const hookConsoleLog = (out) => {  
-  console.log = (...args) => out.push(args);
-} 
-const unhookConsoleLog =  () => {
-  console.log = oConsoleLog;
-}
+const {hookConsoleLog, unhookConsoleLog} = require('./testUtils');
 // hide init logs from jest 
 hookConsoleLog([]);
 const { makeCommandsObject } = require('../src/commands/index');
