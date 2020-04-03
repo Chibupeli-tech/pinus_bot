@@ -4,10 +4,7 @@ const config = require('./config');
 
 global.client = new Discord.Client();
 const handlers = require('./src/handlers');
-const { kickPasha } = require('./commands/pasha');
-const { commands } = require('./commands');
-
-
+const {kickPasha} = require('./src/commands/pasha');
 client.on('ready', () => {
   handlers.handleReady();
 });
