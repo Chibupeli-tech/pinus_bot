@@ -1,8 +1,10 @@
-const {bannedIds, allowedIds} = require('./ids');
+const { bannedIds, allowedIds } = require('./ids');
 const { updateFromDb } = require('./db');
 const { reportError } = require('./error');
+const { kickPasha } = require('./commands/pasha');
+const { commands } = require('./commands');
 
-function handleMessage(message, commands) {
+function handleMessage(message) {
   if (!allowedIds.includes(message.author.id))
     return;
 
@@ -12,7 +14,6 @@ function handleMessage(message, commands) {
   const cmd = message.content.replace('..', '');
   const args = cmd.split(' ');
   const [name] = args;
-  console.log({ name, cmd, args });
   for (const command of commands) {
 
     if (command.name !== name)
@@ -29,12 +30,12 @@ function handleMessage(message, commands) {
 
 }
 
-function handleJoin(member, greetingsChannelId, kickBanned) {
+function handleJoin(member, greetingsChannelId) {
   const channel = member.guild.channels.cache.find(ch => ch.id === greetingsChannelId);
   if (!channel)
     return;
   if (bannedIds.includes(member.id)) {
-    kickBanned(channel, member);
+    kickPasha(channel, member);
   }
 }
 

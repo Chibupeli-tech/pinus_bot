@@ -37,9 +37,10 @@ function updateFromDb() {
     // xD
     Array(bannedIds.length).fill(0).forEach(() => { bannedIds.pop() });
     bannedIds.push(...data.map(({ discord_id }) => discord_id));
-    console.log('Id index updated...');
+    console.log('Id index updated!');
   }).catch(err => {
     bannedIds.push(...['318834208741261312', '594919505956700170']);
+    console.log('Id index update failed.');
     reportError(err);
   });
 }
