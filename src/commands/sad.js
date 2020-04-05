@@ -1,39 +1,38 @@
+const { reportError } = require('../error');
 const nicknameMap = new Map();
 
 module.exports = {
   commands: [{
     name: 'sadmoment',
     f: (message, args) => {
-      const {ownerID} = message.guild;
+      const { ownerID } = message.guild;
       message.guild.members.fetch().then((members) => {
         members.forEach(member => {
           const { user, nickname } = member;
           nicknameMap.set(user.id, nickname);
-          if (user.id === ownerID) 
+          if (user.id === ownerID)
             return;
           member.setNickname('🥺')
-            .then(mmbr => { console.log(mmbr.nickname) })
-            .catch((err) => { console.log(err);});
-          console.log(user.id, nickname);
+            .catch((err) => { reportError(err); });
         });
-        console.log(nicknameMap);
+        message.channel.send(`Done!`);
       });
     }
   },
   {
     name: 'undosad',
     f: (message, args) => {
-      const {ownerID} = message.guild;
-      console.log('Fetching members')
+      const { ownerID } = message.guild;
       message.guild.members.fetch().then((members) => {
         members.forEach(member => {
           const { user } = member;
-          if (user.id === ownerID) 
+          if (user.id === ownerID)
             return;
           const oldNickname = nicknameMap.get(user.id);
           member.setNickname(oldNickname)
-            .catch((err) => { console.log(err) });
+            .catch((err) => { reportError(err); });
         });
+        message.channel.send(`Done!`);
       });
     }
   }
