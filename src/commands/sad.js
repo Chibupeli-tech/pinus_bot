@@ -9,7 +9,7 @@ module.exports = {
       message.guild.members.fetch().then((members) => {
         members.forEach(member => {
           const { user, nickname } = member;
-          nicknameMap.set(user.id, nickname);
+          nicknameMap.set(user.id+message.guild.id, nickname);
           if (user.id === ownerID)
             return;
           member.setNickname('🥺')
@@ -28,7 +28,7 @@ module.exports = {
           const { user } = member;
           if (user.id === ownerID)
             return;
-          const oldNickname = nicknameMap.get(user.id);
+          const oldNickname = nicknameMap.get(user.id+message.guild.id)||null;
           member.setNickname(oldNickname)
             .catch((err) => { reportError(err); });
         });
