@@ -6,6 +6,10 @@ module.exports = {
     name: 'sadmoment',
     f: (message, args) => {
       const { ownerID } = message.guild;
+      const musicChannel = message.guild.channels.cache.find(ch => /music/gm.test(ch.name));
+      if (musicChannel) {
+        musicChannel.send(';;p https://www.youtube.com/watch?v=pgN-vvVVxMA');
+      }
       message.guild.members.fetch().then((members) => {
         members.forEach(member => {
           const { user, nickname } = member;
