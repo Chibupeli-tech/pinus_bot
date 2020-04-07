@@ -1,37 +1,15 @@
 const { reportError } = require('../error');
-
-const MS = 1;
-const SECOND = 1000 * MS;
-const MINUTE = 60 * SECOND;
-const HOUR = 60 * MINUTE;
-
-function parseTime(timeString) {
-  const [fullMatch, digit, units] = /(\d*)(h|min|s)/.exec(timeString);
-  const intVal = parseInt(digit, 10);
-
-  switch (units) {
-    case 'h':
-      return intVal * HOUR;
-    case 'min':
-      return intVal * MINUTE;
-    case 's':
-      return intVal * SECOND;
-    default:
-      throw new Error('Cant parse time');
-      break;
-  }
-}
+const { parseTime, isParsableTime, idFromMention } = require('../utils');
 
 function parseArgs(args) {
   const [_, ...rest] = args;
   const idList = [];
-  const orValidID = (token) => (/<@!(\d*)>/gm.exec(token) || [undefined, undefined])[1];
   let expectingComma = false;
   for (let i = 0; i < rest.length; i++) {
     const el = rest.shift();
     
-    if (orValidID(el)) {
-      idList.push(orValidID(el));
+    if (idFromMention(el)) {
+      idList.push(idFromMention(el));
       expectingComma = true;
       continue;
     }
@@ -56,7 +34,7 @@ function parseArgs(args) {
         )
       );
     }
-    if (/(\d*)(h|min|s)/.test(token)) {
+    if (isParsableTime(token)) {
       timeFrame = parseTime(token);
     }
   }

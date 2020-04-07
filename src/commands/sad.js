@@ -1,5 +1,6 @@
 const ytdl = require('ytdl-core');
 const { reportError } = require('../error');
+const {fromCharCodeArray} = require('../utils');
 const nicknameMap = new Map();
 
 function playYTsong(url, message) {
@@ -48,9 +49,6 @@ function restoreNicnames(message) {
   });
 }
 
-function fromCharCodeArray(arr) {
-  return arr.reduce((acc, cv) => acc + String.fromCharCode(cv), '');
-}
 
 module.exports = {
   commands: [
