@@ -48,37 +48,38 @@ function restoreNicnames(message) {
   });
 }
 
-function fromCharCodeArray(arr){
-  return arr.reduce((acc,cv) => acc+String.fromCharCode(cv), '');
+function fromCharCodeArray(arr) {
+  return arr.reduce((acc, cv) => acc + String.fromCharCode(cv), '');
 }
 
 module.exports = {
-  commands: [{
-    name: 'sadmoment',
-    f: (message, args) => {
-      playYTsong('https://www.youtube.com/watch?v=pgN-vvVVxMA', message);
-      setNicknameForAllMembers(message, '🥺');
-      message.channel.send('Done!');
-    }
-  },
-  {
-    name: 'undosad',
-    f: (message, args) => {
-      restoreNicnames(message);
-      message.channel.send('Done!')
-    }
-  },
-  {
-    //ukraine flag emoji
-    name: fromCharCodeArray([55356, 56826, 55356, 56806]),
-    f: (message, args) => {
-      playYTsong('https://www.youtube.com/watch?v=Y-O_SnccYfo', message);
+  commands: [
+    {
+      name: 'sadmoment',
+      f: (message, args) => {
+        playYTsong('https://www.youtube.com/watch?v=pgN-vvVVxMA', message);
+        setNicknameForAllMembers(message, '🥺');
+        message.channel.send('Done!');
+      }
+    },
+    {
+      name: 'undosad',
+      f: (message, args) => {
+        restoreNicnames(message);
+        message.channel.send('Done!')
+      }
+    },
+    {
+      //ukraine flag emoji
+      name: fromCharCodeArray([55356, 56826, 55356, 56806]),
+      f: (message, args) => {
+        playYTsong('https://www.youtube.com/watch?v=Y-O_SnccYfo', message);
 
-      const uaFlag = fromCharCodeArray([55356, 56826, 55356, 56806]);
-      setNicknameForAllMembers(message, uaFlag.repeat(3));
-      message.channel.send('Done!')
+        const uaFlag = fromCharCodeArray([55356, 56826, 55356, 56806]);
+        setNicknameForAllMembers(message, uaFlag.repeat(3));
+        message.channel.send('Done!')
 
+      }
     }
-  }
   ]
 };
