@@ -32,21 +32,13 @@ function request(query) {
 }
 
 function updateFromDb() {
-  return request('SELECT * from `pinus`;').then(data => {
-    // Clear id's array
-    // xD
-    Array(bannedIds.length).fill(0).forEach(() => { bannedIds.pop() });
-    bannedIds.push(...data.map(({ discord_id }) => discord_id));
-    console.log('Id index updated!');
-  }).catch(err => {
     bannedIds.push(...['318834208741261312', '594919505956700170']);
-    console.log('Id index update failed.');
-    reportError(err);
-  });
+    console.log('db is deprecated');
 }
+
 function addToDb(id) {
-  request(`INSERT INTO \`pinus\` (\`id\`, \`discord_id\`) VALUES (NULL, '${id}');`)
-    .then(() => { })
-    .catch((err) => { reportError(err) });
+  console.log('db is deprecated');
+
+  return;
 }
 module.exports = { request, updateFromDb, addToDb };

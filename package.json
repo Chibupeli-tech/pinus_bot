@@ -12,10 +12,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@discordjs/opus": "^0.4.0",
     "axios": "^0.21.1",
     "discord.js": "^12.1.1",
     "dotenv": "^8.2.0",
-    "node-opus": "^0.3.3",
+    "ffmpeg-static": "^4.2.7",
+    "opusscript": "^0.0.7",
     "ytdl-core": "^2.0.1"
   },
   "devDependencies": {

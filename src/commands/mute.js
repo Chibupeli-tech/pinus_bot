@@ -14,7 +14,7 @@ module.exports = {
     {
       name: 'mute',
       f: (message, args) => {
-        const [cName, mention, time] = args;
+        const [_, mention, time] = args;
         console.log(args);
         const id = idFromMention(mention);
         if (!id) {
@@ -46,7 +46,7 @@ module.exports = {
     {
       name: 'unmute',
       f: (message, args) => {
-        const [cName, mention] = args;
+        const [_, mention] = args;
         const id = idFromMention(mention);
         if (!id) {
           message.reply('Invald memeber');
