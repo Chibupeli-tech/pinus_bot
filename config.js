@@ -7,6 +7,10 @@ require('dotenv').config();
  * @prop {strign} DB_USER Database username
  * @prop {strign} DB_PASS Database password
  * @prop {strign} BOT_TOKEN Discord token
+ * @prop {strign} HEROKU_APP_ID Heroku application id
+ * @prop {strign} HEROKU_DYNO_ID Heroku dyno id
+ * @prop {strign} HEROKU_SLUG_COMMIT Slug commit hash
+ * @prop {strign} HEROKU_RELEASE_CREATED_AT Deploy date
  * 
  */
 /**
