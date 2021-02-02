@@ -3,10 +3,13 @@ function loop(message, id, interval) {
   const destTime = new Date().getTime() + interval;
 
   const runner = () => setTimeout(() => {
+    message.channel.send(`<@!${id}>`)
+      .then(msg => msg.delete({ timeout: 1000 }));
+    
     if (new Date().getTime() >= destTime) {
       return;
     }
-    message.channel.send(`<@!${id}>`);
+    
     runner();
   }, 5000);
   runner();
