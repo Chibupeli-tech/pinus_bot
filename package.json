@@ -18,7 +18,7 @@
     "dotenv": "^8.2.0",
     "ffmpeg-static": "^4.2.7",
     "opusscript": "^0.0.7",
-    "ytdl-core": "^2.0.1"
+    "ytdl-core": "^4.4.5"
   },
   "devDependencies": {
     "jest": "^25.2.6",

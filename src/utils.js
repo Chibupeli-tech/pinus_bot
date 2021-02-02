@@ -1,8 +1,17 @@
+const { setupMaster } = require('cluster');
+
 const MS = 1;
 const SECOND = 1000 * MS;
 const MINUTE = 60 * SECOND;
 const HOUR = 60 * MINUTE;
 
+function sha256sum(path) {
+  const crypto = require('crypto');
+  const fs = require('fs');
+  const hash = crypto.createHash('sha256');
+  hash.update(fs.readFileSync(path));
+  return hash.digest('hex');    
+}
 
 function fromCharCodeArray(arr) {
   return arr.reduce((acc, cv) => acc + String.fromCharCode(cv), '');
@@ -35,4 +44,4 @@ function idFromMention(mention) {
   }
 }
 
-module.exports = {fromCharCodeArray, parseTime, isParsableTime, idFromMention};
+module.exports = {fromCharCodeArray, parseTime, isParsableTime, idFromMention, sha256sum};
