@@ -13,6 +13,10 @@ function sha256sum(path) {
   return hash.digest('hex');    
 }
 
+function quoteWrap(x) {
+  return `'${x}'`;
+}
+
 function fromCharCodeArray(arr) {
   return arr.reduce((acc, cv) => acc + String.fromCharCode(cv), '');
 }
@@ -44,4 +48,4 @@ function idFromMention(mention) {
   }
 }
 
-module.exports = {fromCharCodeArray, parseTime, isParsableTime, idFromMention, sha256sum};
+module.exports = {fromCharCodeArray, parseTime, isParsableTime, idFromMention, sha256sum, quoteWrap};
