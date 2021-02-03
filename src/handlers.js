@@ -4,8 +4,13 @@ const { reportError } = require('./error');
 const { commands } = require('./commands');
 
 function handleMessage(message) {
-  if (!allowedIds.includes(message.author.id))
+  const member = message.guild.member(message.author);
+  console.log();
+  console.log('XYU'.repeat(10));
+  if (!allowedIds.includes(message.author.id) || !member.roles.cache.has('765162534285213706')) {
+    message.reply('АХАХАХХА долбаеб');
     return;
+  }
 
   if (!message.content.startsWith('..'))
     return;
