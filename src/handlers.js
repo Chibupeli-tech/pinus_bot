@@ -4,16 +4,17 @@ const { reportError } = require('./error');
 const { commands } = require('./commands');
 
 function handleMessage(message) {
-  const member = message.guild.member(message.author);
-
-  if (!allowedIds.includes(message.author.id) || !member.roles.cache.has('765162534285213706')) {
-    message.reply('АХАХАХХА долбаеб');
-    return;
-  }
-
   if (!message.content.startsWith('..'))
     return;
 
+  const member = message.guild.member(message.author);
+
+  if (!allowedIds.includes(message.author.id) && !member.roles.cache.has('765162534285213706')) {
+    message.reply('АХАХАХХА долбаеб');
+    return;
+  }
+  console.log('poxuy')
+  
   const cmd = message.content.replace('..', '');
   const args = cmd.split(' ');
   const [name] = args;

@@ -35,6 +35,14 @@ setReportError(report);
 
 const mockMessages = {
   'command': {
+    guild: {
+      member: () => ({
+        roles: {
+          cache: new Map()
+        }
+      })
+    },
+    reply: console.log,
     author: { id: '0' },
     content: '..test',
     channel: {
@@ -42,6 +50,14 @@ const mockMessages = {
     }
   },
   'non-command': {
+    guild: {
+      member: () => ({
+        roles: {
+          cache: new Map()
+        }
+      })
+    },
+    reply: console.log,
     author: { id: '0' },
     content: 'test',
     channel: {
@@ -49,6 +65,14 @@ const mockMessages = {
     }
   },
   'error-command': {
+    guild: {
+      member: () => ({
+        roles: {
+          cache: new Map()
+        }
+      })
+    },
+    reply: console.log,
     author: { id: '0' },
     content: '..error',
     channel: {
@@ -56,6 +80,14 @@ const mockMessages = {
     }
   },
   'not-allowed': {
+    guild: {
+      member: () => ({
+        roles: {
+          cache: new Map()
+        }
+      })
+    },
+    reply: console.log,
     author: { id: '12321' },
     content: '..fail',
     channel: {
