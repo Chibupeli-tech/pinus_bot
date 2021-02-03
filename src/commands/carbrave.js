@@ -116,7 +116,17 @@ module.exports = {
       {
         name: 'crabrave',
         f: (message, args) => {
-          const [_, top_text, bottom_text] = args;
+          const [_, ...rest] = args;
+          
+          if(rest.length == 0) {
+            message.reply('Чел ты...');
+            return;
+          }
+
+          const middle      = Math.floor(rest.length / 2);
+          const top_text    = rest.slice(0,middle).join(' ');
+          const bottom_text = rest.slice(middle).join(' ');
+
           msg = message;
           message.reply('Работаем');
           commandWrapper(message, top_text, bottom_text);
