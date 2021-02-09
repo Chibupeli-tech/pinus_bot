@@ -2,10 +2,7 @@ require('dotenv').config();
 
 /**
  * @typedef Configuration
- * @prop {strign} DB_URL Database connection url
- * @prop {strign} DB_NAME Database name
- * @prop {strign} DB_USER Database username
- * @prop {strign} DB_PASS Database password
+ * @prop {strign} DB_REBUILD_TO Database rebuld timeout (ms)
  * @prop {strign} BOT_TOKEN Discord token
  * @prop {strign} HEROKU_APP_ID Heroku application id
  * @prop {strign} HEROKU_DYNO_ID Heroku dyno id
