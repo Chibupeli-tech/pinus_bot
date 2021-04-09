@@ -1,8 +1,19 @@
-import { time } from 'console';
 import { Channel, GuildChannel, GuildChannelManager, GuildManager, Structures, TextChannel } from 'discord.js';
 import { gunzipSync, gzipSync } from 'zlib';
 import Config from '../../config';
 
+function objHas(a: object, b: object): boolean {
+  const [jsona, jsonb] =
+    [
+      JSON.stringify(a).replace(/{|}/gm, ''),
+      JSON.stringify(b).replace(/{|}/gm, '')
+    ].sort((a, b) => b.length - a.length);
+
+  const idx = jsona.indexOf(jsonb);
+  console.log({ idx, jsona, jsonb });
+  return idx >= 0;
+
+}
 const USE_GZIP = true;
 export class GuildDb {
   private static instance: GuildDb;
@@ -16,7 +27,7 @@ export class GuildDb {
 
 
 
-  public static getInstance(): any {
+  public static getInstance(): GuildDb {
     if (!this.instance) {
       this.instance = new this();
     }
@@ -36,15 +47,18 @@ export class GuildDb {
 
   isUpdatePending(guild_id: string): boolean {
     const x = this.rebuild_timeout_map.get(guild_id);
-    console.log(x, !!x);
     return !!x;
   }
 
-  init(guilds: GuildManager) {
+  async init(guilds: GuildManager) {
     for (const [id, guild] of guilds.cache) {
       const text_channels = guild.channels.cache.filter(e => e.type === 'text');
       let channel = text_channels.find(e => e.name === GuildDb.CHANNEL_NAME);
-
+      if (channel) {
+        const fetched = await this.fetchDb(channel);
+        this.db_guild.set(id, fetched);
+        this.scheduleUpdate(id);
+      }
       if (!channel) {
         GuildDb.createBackstageChannel(guild.channels).then((new_channel: TextChannel) => {
           channel = new_channel;
@@ -56,13 +70,22 @@ export class GuildDb {
 
   autoZip(payload: string): string {
     const ziped = gzipSync(payload).toString('base64');
+    // Dont bother if gziped payload takes more space
     return ziped.length < payload.length ? ziped : payload;
   }
 
-  setValue(guild_id: string, obj: Object) {
+  setValue(guild_id: string, obj: Object, force: boolean = false) {
     const channel = this.db_channels.get(guild_id);
     if (!channel)
       throw new Error(`Channel not found for guild_id=${guild_id}`);
+
+    if (!force) {
+      const in_mem = this.db_guild.get(guild_id) || {};
+      const same = objHas(in_mem, obj);
+      if (same) {
+        return;
+      }
+    }
 
     const sendMessage = (msg: any) =>
       channel.fetch()
@@ -103,7 +126,13 @@ export class GuildDb {
       return JSON.parse(unzip);
     }
   }
-
+  async safeGet(guild_id: string, key: string): Promise<any> {
+    try {
+      return await this.getValue(guild_id, key)
+    } catch(e) {
+      return undefined;
+    } 
+  }
   async getValue(guild_id: string, key: string): Promise<any> {
     const in_mem = this.db_guild.get(guild_id) || {};
     if (key in in_mem) {
@@ -138,6 +167,7 @@ export class GuildDb {
 
     throw new Error("Key not found");
   }
+
   scheduleUpdate(guild_id: string): void {
     if (this.isUpdatePending(guild_id))
       return;
@@ -146,6 +176,20 @@ export class GuildDb {
       this.rebuldDatabase(guild_id)
     }, Config.DB_REBUILD_TO || 10 * 60 * 1000);
     this.rebuild_timeout_map.set(guild_id, timeout);
+  }
+  async fetchDb(channel: GuildChannel) {
+    const mm = (channel as TextChannel).messages;
+
+    const tmp_obj = {};
+    const messages = await mm.fetch({ limit: 55 })
+
+    const msg_by_me = messages.filter(msg => msg.client.user?.id == msg.author.id).array().reverse();
+
+    for (const message of msg_by_me) {
+      const msgData = this.autoUnzip(message.content);
+      Object.assign(tmp_obj, msgData);
+    }
+    return tmp_obj;
   }
 
   async rebuldDatabase(guild_id: string) {
@@ -169,7 +213,7 @@ export class GuildDb {
 
     this.db_guild.set(guild_id, tmp_obj);
 
-    this.setValue(guild_id, tmp_obj);
+    this.setValue(guild_id, tmp_obj, true);
 
     this.rebuild_timeout_map.set(guild_id, null);
     console.log('db rebuild end');
