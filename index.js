@@ -5,12 +5,12 @@ const {GuildDb} = require('./src/lib/GuildDb');
 global.client = new Discord.Client();
 const handlers = require('./src/handlers');
 const { kickPasha } = require('./src/commands/pasha');
-client.on('ready', () => {
+client.on('ready', async () => {
   handlers.handleReady();
   console.log(GuildDb);
-  GuildDb.getInstance().init(client.guilds);
+  await GuildDb.getInstance().init(client.guilds);
   GuildDb.getInstance().setValue('694527517155131402', {asdfasdf: 2});
-  GuildDb.getInstance().getValue('694527517155131402', 'asdfasdf').then(e => console.log(e))
+  GuildDb.getInstance().getValue('694527517155131402', 'asdfasdf')
 });
 
 client.on('message', message => {
@@ -22,5 +22,10 @@ client.on('guildMemberAdd', member => {
   handlers.handleJoin(member, '422309477132402690', kickPasha);
 });
 
+process.on('unhandledRejection', (reason, promise) => {
+  console.log('Unhandled Rejection at:', reason.stack || reason)
+  // Recommended: send the information to sentry.io
+  // or whatever crash reporting service you use
+})
 client.login(config.BOT_TOKEN);
 
