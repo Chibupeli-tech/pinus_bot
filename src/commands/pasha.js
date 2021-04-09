@@ -1,6 +1,6 @@
 const { bannedIds: pashas_ids } = require('../ids');
 const { addToDb } = require('../db');
-
+import { UserConfig } from '../ids';
 function findPasha() {
   const list = client.guilds.cache.get(tgt_server);
   const found = list.members.cache.find(member => {
@@ -27,12 +27,21 @@ function kickPasha(channel, member, ttl = null) {
   }, kickTimeout * 1000);
 }
 
-function logPasha(msg) {
-  Promise.all(
-    pashas_ids.map(p => client.users.fetch(p))
-  ).then(
-    (r) => msg.channel.send(`All known accounts: ${r.join(' ')}`)
-  );
+async function logPasha(msg) {
+  const banned = UserConfig.getInstance().getBanned()
+  try {
+    const all = [];
+    for (b of banned) {
+      const x = client.users.fetch(b).then(e => e).catch(e => console.error('piiiiiiiiiiiiiiiiiizda'));
+      all.push(x);
+    }
+    msg.channel.send(`All known accounts: ${all.join(' ')}`);
+    return;
+  }
+  catch (e) {
+    msg.channel.send('Error fetching user data');
+    return;
+  }
 }
 
 
@@ -44,11 +53,11 @@ const commands = [
 
       if (!(parseInt(id, 10) > 0))
         throw new Error('Invalid id');
+      UserConfig.getInstance(message.guild.id).addBanned(id);
 
-      pashas_ids.push(id);
       message.channel.send(`Id added`);
 
-      addToDb(id);
+      //addToDb(id);
 
       logPasha(message);
       message.channel.send(`Running retard check...`);

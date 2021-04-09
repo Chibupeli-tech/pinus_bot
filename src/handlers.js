@@ -1,4 +1,4 @@
-const { bannedIds, allowedIds } = require('./ids');
+const { bannedIds, allowedIds, UserConfig } = require('./ids');
 const { updateFromDb } = require('./db');
 const { reportError } = require('./error');
 const { commands } = require('./commands');
@@ -9,7 +9,7 @@ function handleMessage(message) {
 
   const member = message.guild.member(message.author);
 
-  if (!allowedIds.includes(message.author.id) && !member.roles.cache.has('765162534285213706')) {
+  if (!UserConfig.getInstance().isUserAllowed(message.author) && !member.roles.cache.has('765162534285213706')) {
     message.reply('АХАХАХХА долбаеб');
     return;
   }
